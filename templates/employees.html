@@ -1,0 +1,28 @@
+{% extends 'basic.html' %}
+
+{% block search %}
+<h2>Поиск сотрудника по id</h2>
+{{ super() }}
+<br>
+{% endblock %}
+{% block results %}
+<br>
+<table border="3">
+  <tr>
+    <th>ID Работника</th>
+    <th>Имя</th>
+    <th>Должность</th>
+    <th>Телефон</th>
+    <th>Департамент</th>
+  </tr>
+  {% for res in results %}
+    <tr>
+      <td><a href="http://127.0.0.1:5000/search?Сотрудники={{res.id}}">{{res.id}}</a></td>
+      <td>{{res.name}}</td>
+      <td>{{res.position}}</td>
+      <td><a href="tel:+{{res.phone}}">{{res.phone}}</a></td>
+      <td><a href="http://127.0.0.1:5000/search?Департаменты={{res.dep_id}}">{{res.dep_id}}</a></td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}

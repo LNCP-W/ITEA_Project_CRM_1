@@ -1,0 +1,60 @@
+{% extends 'basic.html' %}
+
+{% block search %}
+{% endblock %}
+{% block results %}
+
+<br>
+
+<form action="http://127.0.0.1:5000/edit_department" method="post/get" >
+    <table border="0">
+       <tr>
+            <td>ID Департамента</td>
+            <td><input readonly name="id"  value={{results[0].id}}><br></td>
+        </tr>
+        <tr>
+            <td>Название</td>
+            <td><input type="text" name="name"  value="{{results[0].name}}"></td>
+        </tr>
+        <tr>
+            <td>Локация</td>
+            <td><input type="text" name="location" value="{{results[0].location}}"></td>
+        </tr>
+        <tr>
+            <td>Телефон</td>
+            <td><input type="number" name="phone" value="{{results[0].phone}}"> </td>
+        </tr>
+    </table>
+    <input type="submit" value="Изменить">
+    <input type="reset" value="Очистить">
+ </form>
+<form>
+  <input type="search" hidden name="id" value="{{results[0].id}}">
+  <input type="submit" onclick="return confirm('Удалить департамент {{results[0].name}}?')" formaction="http://127.0.0.1:5000/delete_dep" value="Удалить">
+</form>
+
+<h2>Сотрудники департамента</h2>
+<form>
+  <input type="search" hidden name="id" value="{{results[0].id}}">
+  <input type="submit" formaction="http://127.0.0.1:5000/create_emp" value="Регистрация сотрудника">
+</form>
+<table border="3">
+  <tr>
+    <th>ID Работника</th>
+    <th>Имя</th>
+    <th>Должность</th>
+    <th>Телефон</th>
+    <th>Департамент</th>
+  </tr>
+  {% for res in results[1] %}
+    <tr>
+      <td><a href="http://127.0.0.1:5000/search?Сотрудники={{res.id}}">{{res.id}}</a></td>
+      <td>{{res.name}}</td>
+      <td>{{res.position}}</td>
+      <td><a href="tel:+{{res.phone}}">{{res.phone}}</a></td>
+      <td><a href="http://127.0.0.1:5000/search?Департаменты={{res.dep_id}}">{{res.dep_id}}</a></td>
+    </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'basic.html' %}
+
+{% block search %}
+
+<h2>Поиск заявки по id</h2>
+{{ super() }}
+<br>
+{% endblock %}
+{% block results %}
+<br>
+<table border="3">
+  <tr>
+    <th>ID Заявки</th>
+    <th>Дата создания</th>
+    <th>Создатель</th>
+    <th>Клиент</th>
+    <th>Статус</th>
+    <th>Тип</th>
+    <th>Описание</th>
+    <th>Серийный номер</th>
+    <th>Цена</th>
+    <th>Обновлено</th>
+  </tr>
+    {%for res in results %}
+    <tr>
+      <td><a href="http://127.0.0.1:5000/search?Заявки={{res.id}}">{{res.id}}</a></td>
+      <td>{{res.created.strftime("%d/%m/%Y, %H:%M")}}</td>
+      <td><a href="http://127.0.0.1:5000/search?Сотрудники={{res.creator}}">{{res.creator}}</a></td>
+      <td><a href="http://127.0.0.1:5000/search?Клиенты={{res.customer}}">{{res.customer}}</a></td>
+      <td>{{res.status}}</td>
+      <td>{{res.type}}</td>
+      <td>{{res.descript}}</td>
+      <td>{{res.serial}}</td>
+      <td>{{res.price}}</td>
+      <td>{{res.updated.strftime("%d/%m/%Y, %H:%M")}}</td>
+    </tr>
+  {% endfor%}
+</table>
+
+{% endblock %}
+
+
+

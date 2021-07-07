@@ -1,0 +1,61 @@
+{% extends 'basic.html' %}
+
+{% block search %}
+{% endblock %}
+{% block results %}
+<form action="http://127.0.0.1:5000/create_ord"  method="post/get " >
+    <table border="0">
+        <tr>
+            <td>Клиент</td>
+            <td><select name="customer" required /td>
+                <option selected disabled  ></option>
+                {% for customer in customers %}
+                <option value="{{customer.id}}">{{customer.name}}</option>
+                {% endfor %}
+        </tr>
+        <tr>
+            <td>Статус</td>
+            <td>
+                <select name="status" required>
+                    <option selected disabled  ></option>
+                    <option value="Новый">Новый</option>
+                    <option value="В работе">В работе</option>
+                    <option value="Готов">Готов</option>
+                    <option value="Отказ">Отказ</option>
+                    <option value="Ждет запчасть">Ждет запчасть</option>
+                    <option value="Выдан клиету">Выдан клиету</option>
+                </select>
+            </td>
+        </tr>
+                <tr>
+            <td>Тип</td>
+            <td>
+            <select name="type" required>
+                    <option selected disabled ></option>
+                    <option value="Платный">Платный</option>
+                    <option value="Гарантийный">Гарантийный</option>
+                    <option value="Другой">Другой</option>
+            </select>
+            </td>
+        </tr>
+        <tr>
+        <td>Описание</td>
+            <td><input type="text" name="descript" value=""> </td>
+        </tr>
+        <tr>
+            <td>Серийный Номер</td>
+            <td><input type="text" name="serial" value=""> </td>
+        </tr>
+        <tr>
+            <td>Цена</td>
+            <td><input type="number" name="price" value="0"> </td>
+        </tr>
+        <tr>
+            <td>ID сотрудника</td>
+            <td><input readonly name="creator" value="{{creator}}"> </td>
+        </tr>
+    </table>
+    <input type="submit" value="Создать">
+    <input type="reset" value="Очистить">
+ </form>
+{% endblock %}
