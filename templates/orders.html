@@ -8,6 +8,21 @@
 {% endblock %}
 {% block results %}
 <br>
+<form>
+  <select name="status">
+    <option value="Новый">Новый</option>
+    <option value="В работе">В работе</option>
+    <option value="Готов">Готов</option>
+    <option value="Отказ">Отказ</option>
+    <option value="Ждет запчасть">Ждет запчасть</option>
+    <option value="Выдан клиету">Выдан клиету</option>
+  </select>
+  <input type="submit" formaction="http://127.0.0.1:5000/all_orders" value="Фильтровать по статусу">
+</form>
+<form>
+  <input type="date" name="date">
+  <input type="submit" formaction="http://127.0.0.1:5000/all_orders" value="Фильтровать по дате">
+</form>
 <table border="3">
   <tr>
     <th>ID Заявки</th>

@@ -65,5 +65,9 @@
     <input type="submit" value="Изменить">
     <input type="reset" value="Очистить">
  </form>
+ <form>
+     <input type="search" hidden name="id" value="{{results[0].id}}">
+     <input type="submit" onclick="return confirm('Удалить Заявку {{results[0].id}}?')" formaction="http://127.0.0.1:5000/delete_ordr" value="Удалить">
+ </form>
 
 {% endblock %}

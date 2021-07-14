@@ -10,7 +10,7 @@ class Departments(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
     location = db.Column(db.String(50), nullable=False)
-    phone = db.Column(db.Integer)
+    phone = db.Column(db.BigInteger)
 
     def __str__(self):
         return f"Department {self.name} with id:{self.id} located in {self.location}"
@@ -29,7 +29,7 @@ class Employees(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
     position = db.Column(db.String(50), nullable=False)
-    phone = db.Column(db.Integer, nullable=False)
+    phone = db.Column(db.BigInteger, nullable=False)
     dep_id = db.Column(db.Integer, db.ForeignKey('departments.id', ondelete='CASCADE'), nullable=False)
 
     def __str__(self):
@@ -50,7 +50,7 @@ class Employees(db.Model):
 class Customers(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
-    phone = db.Column(db.Integer, nullable=False)
+    phone = db.Column(db.BigInteger, nullable=False)
     is_problem = db.Column(db.Boolean, default=False)
     is_subscribed = db.Column(db.Boolean, default=False)
     chat_id = db.Column(db.Integer, unique=True)

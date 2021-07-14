@@ -33,6 +33,24 @@ def search():
     return render_template(res[2], title=res[0].id, results=res)
 
 
+
+@app.route('/employee', methods=["GET"])
+def employee():
+    id = request.args["id"]
+    if "status" in request.args:
+        ordrs = Orders.query.filter_by(creator=id, status=request.args["status"]).limit(10).all()
+    elif "date" in request.args:
+        date = datetime.datetime.strptime(request.args["date"], "%Y-%m-%d")
+        ordrs = Orders.query.filter_by(creator=id).filter(
+            Orders.created>=date
+            ).filter(Orders.created < date + datetime.timedelta(days=1)).limit(10).all()
+    else:
+        ordrs = Orders.query.filter_by(creator=id).limit(10).all()
+    res = (Employees.query.filter_by(id=id).first(),
+    ordrs)
+    if not res[0]: id = "Нет такого id"
+    return render_template('employee.html', title=id, results=res)
+
 @app.route('/all_customers')
 def all_customers():
     data = Customers.query.limit(10).all()
@@ -41,9 +59,17 @@ def all_customers():
 
 @app.route('/all_orders')
 def all_orders():
-    data = Orders.query.limit(10).all()
+    if "status" in request.args:
+        ordrs = Orders.query.filter_by(status=request.args["status"]).limit(10).all()
+    elif "date" in request.args:
+        date = datetime.datetime.strptime(request.args["date"], "%Y-%m-%d")
+        ordrs = Orders.query.filter(Orders.created>=date).filter(
+            Orders.created < date + datetime.timedelta(days=1)
+            ).limit(10).all()
+    else:
+        ordrs = Orders.query.limit(10).all()
     page_title = "Заявки"
-    return render_template('orders.html', title=page_title, results=data)
+    return render_template('orders.html', title=page_title, results=ordrs)
 
 
 @app.route('/all_employees')
@@ -69,15 +95,31 @@ def edit_department():
     request.args={"Департаменты":request.args["id"]}
     return search()
 
-@app.route('/edit_employee', methods=["GET"])
+@app.route('/edit_employee', methods=["POST"])
 def edit_employee():
-    emp = Employees.query.filter_by(id=request.args["id"]).first()
-    emp.name = request.args["name"]
-    emp.position = request.args["position"]
-    emp.phone = request.args["phone"]
-    emp.dep_id = request.args["dep_id"]
+    emp = Employees.query.filter_by(id=request.values ["id"]).first()
+    emp.name = request.values["name"]
+    emp.position = request.values["position"]
+    emp.phone = request.values["phone"]
+    emp.dep_id = request.values["dep_id"]
     db.session.commit()
-    request.args={"Сотрудники": request.args["id"]}
+    request.args={"Сотрудники": request.values["id"]}
+    return search()
+
+@app.route('/edit_customer', methods=["POST"])
+def edit_customer():
+    x=request
+    cust = Customers.query.filter_by(id=request.values ["id"]).first()
+    cust.name = request.values["name"]
+    cust.phone = request.values["phone"]
+    # if request.values['is_problem'] == "False":
+    #     is_problem = False
+    # else: is_problem = True
+    if 'is_problem' in request.values:
+        cust.is_problem = bool(request.values['is_problem'])
+    else:cust.is_problem = 0
+    db.session.commit()
+    request.args={"Клиенты": request.values["id"]}
     return search()
 
 @app.route('/edit_order', methods=["GET"])
@@ -161,10 +203,32 @@ def delete_emp():
     db.session.commit()
     return all_employees()
 
+@app.route("/delete_cust")
+def delete_cust():
+    dep = Customers.query.filter_by(id=request.args['id']).first()
+    if not dep: return all_customers()
+    db.session.delete(dep)
+    db.session.commit()
+    return all_customers()
+
+
+@app.route("/delete_ordr")
+def delete_ordr():
+    ordr = Orders.query.filter_by(id=request.values['id']).first()
+    if not ordr: return all_orders()
+    db.session.delete(ordr)
+    db.session.commit()
+    return all_orders()
+
+
+
 @app.route("/index")
 def index():
-    page_title = 'Главная страница'
-    return render_template('index.html', title=page_title)
+    return render_template('index.html', title='Главная страница')
+
+@app.route("/help")
+def help():
+    return render_template('help.html', title="Помощь")
 
 app.run()
 

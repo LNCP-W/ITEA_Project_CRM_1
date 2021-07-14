@@ -6,7 +6,7 @@
 
 <br>
 
-<form action="http://127.0.0.1:5000/edit_employee" method="post/get" >
+<form action="http://127.0.0.1:5000/edit_employee" method="POST" >
     <table border="0">
        <tr>
             <td>ID Работника</td>
@@ -22,7 +22,7 @@
         </tr>
         <tr>
             <td>Телефон</td>
-            <td><input type="number" name="phone" value="{{results[0].phone}}"> </td>
+            <td><input type="number" name="phone" value="{{results[0].phone}}" max="999999999999"> </td>
         </tr>
         <tr>
             <td>Работает в</td>
@@ -41,6 +41,23 @@
   <input type="search" hidden name="creator" value="{{results[0].id}}">
   <input type="submit" formaction="http://127.0.0.1:5000/create_ord" value="Регистрация Заявки">
 </form>
+<form>
+  <select name="status">
+    <option value="Новый">Новый</option>
+    <option value="В работе">В работе</option>
+    <option value="Готов">Готов</option>
+    <option value="Отказ">Отказ</option>
+    <option value="Ждет запчасть">Ждет запчасть</option>
+    <option value="Выдан клиету">Выдан клиету</option>
+  </select>
+  <input type="search" hidden name="id" value="{{results[0].id}}">
+  <input type="submit" formaction="http://127.0.0.1:5000/employee" value="Фильтровать по статусу">
+</form>
+<form>
+  <input type="date" name="date">
+  <input type="search" hidden name="id" value="{{results[0].id}}">
+  <input type="submit" formaction="http://127.0.0.1:5000/employee" value="Фильтровать по дате">
+</form>
 <table border="3">
   <tr>
     <th>ID Заявки</th>
@@ -57,14 +74,14 @@
     {%for res in results[1] %}
     <tr>
       <td><a href="http://127.0.0.1:5000/search?Заявки={{res.id}}">{{res.id}}</a></td>
-      <td>{{res.created}}</td>
+      <td>{{res.created.strftime("%d/%m/%Y, %H:%M")}}</td>
       <td><a href="http://127.0.0.1:5000/search?Сотрудники={{res.creator}}">{{res.creator}}</a></td>
       <td>{{res.status}}</td>
       <td>{{res.type}}</td>
       <td>{{res.descript}}</td>
       <td>{{res.serial}}</td>
       <td>{{res.price}}</td>
-      <td></td>
+      <td>{{res.updated.strftime("%d/%m/%Y, %H:%M")}}</td>
     </tr>
   {% endfor%}
 </table>

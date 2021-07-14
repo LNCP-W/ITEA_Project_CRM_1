@@ -6,6 +6,7 @@
 <a href="http://127.0.0.1:5000/all_employees">Все сотрудники</a>
 <a href="http://127.0.0.1:5000/all_orders">Все заявки</a>
 <a href="http://127.0.0.1:5000/all_customers">Все клиенты</a>
+<a href="http://127.0.0.1:5000/help">Помощь</a>
 
 
 
@@ -25,7 +26,7 @@
 
     {% block search %}
     <form action="http://127.0.0.1:5000/search" method="post/get">
-    <input type="text" name={{title}} size="40" maxlength="50" />
+    <input type="number" name={{title}} size="40" maxlength="50" />
     <input type="submit" value="Поиск" />
     </form>
     {% endblock %}
