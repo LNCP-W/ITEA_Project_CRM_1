@@ -10,21 +10,21 @@
     <table border="0">
        <tr>
             <td>ID зафвки</td>
-            <td><input readonly name="id"  value={{results[0].id}}><br></td>
+            <td><input readonly name="id"  value={{results.id}}><br></td>
         </tr>
         <tr>
             <td>Дата создания</td>
-            <td><input readonly disabled name="created"  value="{{results[0].created.strftime("%d/%m/%Y, %H:%M") }}"></td>
+            <td><input readonly disabled name="created"  value="{{results.created.strftime("%d/%m/%Y, %H:%M") }}"></td>
         </tr>
         <tr>
             <td>Создатель</td>
-            <td><input type="number" name="creator" value="{{results[0].creator}}"></td>
+            <td><input type="number" name="creator" value="{{results.creator}}"></td>
         </tr>
         <tr>
             <td>Статус</td>
             <td>
                 <select name="status" form="data">
-                    <option selected value="{{results[0].status}}">{{results[0].status}}</option>
+                    <option selected value="{{results.status}}">{{results.status}}</option>
                     <option value="Новый">Новый</option>
                     <option value="В работе">В работе</option>
                     <option value="Готов">Готов</option>
@@ -38,7 +38,7 @@
             <td>Тип</td>
             <td>
             <select name="type" form="data">
-                    <option selected value="{{results[0].type}}">{{results[0].type}}</option>
+                    <option selected value="{{results.type}}">{{results.type}}</option>
                     <option value="Платный">Платный</option>
                     <option value="Гарантийный">Гарантийный</option>
                     <option value="Другой">Другой</option>
@@ -47,27 +47,27 @@
         </tr>
         <tr>
             <td>Описание</td>
-            <td><input type="text" name="descript" value="{{results[0].descript}}"> </td>
+            <td><input type="text" name="descript" title="Какая неисправность в устройства" value="{{results.descript}}"> </td>
         </tr>
         <tr>
             <td>Серийный Номер</td>
-            <td><input type="text" name="serial" value="{{results[0].serial}}"> </td>
+            <td><input type="text" name="serial" title="Серийный номер устройства" value="{{results.serial}}"> </td>
         </tr>
         <tr>
             <td>Цена</td>
-            <td><input type="number" name="price" value="{{results[0].price}}"> </td>
+            <td><input type="number" name="price" value="{{results.price}}"> </td>
         </tr>
         <tr>
             <td>Обновлено</td>
-            <td><input readonly disabled name="updated"  value="{{results[0].updated.strftime("%d/%m/%Y, %H:%M") }}"></td>
+            <td><input readonly disabled name="updated"  value="{{results.updated.strftime("%d/%m/%Y, %H:%M") }}"></td>
         </tr>
     </table>
     <input type="submit" value="Изменить">
     <input type="reset" value="Очистить">
  </form>
  <form>
-     <input type="search" hidden name="id" value="{{results[0].id}}">
-     <input type="submit" onclick="return confirm('Удалить Заявку {{results[0].id}}?')" formaction="http://127.0.0.1:5000/delete_ordr" value="Удалить">
+     <input type="search" hidden name="id" value="{{results.id}}">
+     <input type="submit" onclick="return confirm('Удалить Заявку {{results.id}}?')" formaction="http://127.0.0.1:5000/delete_ordr" value="Удалить">
  </form>
 
 {% endblock %}

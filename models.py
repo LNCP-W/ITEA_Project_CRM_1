@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-app = Flask("my_app")
+app = Flask("my_app", template_folder='/home/myr/PycharmProjects/ITEA_projrct_CRM/templates')
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:postgres@localhost/postgres"
 db = SQLAlchemy(app)
 
@@ -31,6 +31,8 @@ class Employees(db.Model):
     position = db.Column(db.String(50), nullable=False)
     phone = db.Column(db.BigInteger, nullable=False)
     dep_id = db.Column(db.Integer, db.ForeignKey('departments.id', ondelete='CASCADE'), nullable=False)
+    chat_id = db.Column(db.BigInteger, unique=True)
+
 
     def __str__(self):
         return f"Employee {self.name} with id:{self.id} worked on position {self.position} " \
@@ -88,7 +90,8 @@ class Orders(db.Model):
 
     def __repr__(self):
         price = self.price
-        if not self.price: price = ''
+        if not self.price:
+            price = ''
         res = {
               "id": self.id,
               "created": self.created.strftime('%d.%m.%Y %H:%M'),

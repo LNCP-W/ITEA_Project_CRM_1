@@ -1,8 +1,13 @@
 import datetime
 import json
+if __name__ == "__main__":
+    import bot
+
 
 from models import app, db, Departments, Employees, Customers, Orders
 from flask import Flask, request, render_template
+app.config['DEBUG'] = True
+app.config['TESTING'] = True
 
 @app.route('/search', methods=["GET"])
 def search():
@@ -33,6 +38,18 @@ def search():
     return render_template(res[2], title=res[0].id, results=res)
 
 
+@app.route('/order', methods=["GET"])
+def order():
+    id = request.args["id"]
+    res = Orders.query.filter_by(id=id).first()
+    return render_template('order.html', title=id, results=res)
+
+@app.route('/department', methods=["GET"])
+def department():
+    id = request.args["id"]
+    res = [Departments.query.filter_by(id=id).first(), Employees.query.filter_by(dep_id=id).limit(10).all()]
+    return render_template('department.html', title=id, results=res)
+
 
 @app.route('/employee', methods=["GET"])
 def employee():
@@ -60,7 +77,14 @@ def all_customers():
 @app.route('/all_orders')
 def all_orders():
     if "status" in request.args:
-        ordrs = Orders.query.filter_by(status=request.args["status"]).limit(10).all()
+        if request.args["status"] == 'activ':
+            ordrs = Orders.query.filter(
+                (Orders.status == "Новый") |
+                (Orders.status == "В работе") |
+                (Orders.status == "Ждет запчасть")
+                ).limit(10).all()
+        else:
+            ordrs = Orders.query.filter_by(status=request.args["status"]).limit(10).all()
     elif "date" in request.args:
         date = datetime.datetime.strptime(request.args["date"], "%Y-%m-%d")
         ordrs = Orders.query.filter(Orders.created>=date).filter(
@@ -93,7 +117,7 @@ def edit_department():
     dep.phone = request.args["phone"]
     db.session.commit()
     request.args={"Департаменты":request.args["id"]}
-    return search()
+    return search
 
 @app.route('/edit_employee', methods=["POST"])
 def edit_employee():
@@ -104,7 +128,7 @@ def edit_employee():
     emp.dep_id = request.values["dep_id"]
     db.session.commit()
     request.args={"Сотрудники": request.values["id"]}
-    return search()
+    return search
 
 @app.route('/edit_customer', methods=["POST"])
 def edit_customer():
@@ -120,11 +144,12 @@ def edit_customer():
     else:cust.is_problem = 0
     db.session.commit()
     request.args={"Клиенты": request.values["id"]}
-    return search()
+    return search
 
 @app.route('/edit_order', methods=["GET"])
 def edit_order():
     ord = Orders.query.filter_by(id=request.args["id"]).first()
+    old_status = ord.status
     ord.creator = request.args["creator"]
     ord.status = request.args["status"]
     ord.type = request.args["type"]
@@ -133,8 +158,11 @@ def edit_order():
     ord.price = request.args["price"]
     ord.updated = datetime.datetime.now()
     db.session.commit()
-    request.args={"Заявки": request.args["id"]}
-    return search()
+    if old_status != request.args["status"]:
+        customer = Customers.query.filter_by(id=ord.customer).first().chat_id
+        if customer:
+            bot.send_notification(customer, f"Статус заяви №{ord.id} изменен: {request.args['status']}")
+    return order()
 
 @app.route("/create_dep")
 def create_dep():
@@ -145,8 +173,8 @@ def create_dep():
         new_dep = Departments(**request.args)
         db.session.add(new_dep)
         db.session.commit()
-        request.args = {"Департаменты": new_dep.id}
-        return search()
+        request.args = {"id": new_dep.id}
+        return department()
 
 
 @app.route("/create_customer")
@@ -159,7 +187,7 @@ def create_customer():
         db.session.add(new_cli)
         db.session.commit()
         request.args = {"Клиенты": new_cli.id}
-        return search()
+        return all_orders
 
 @app.route("/create_emp")
 def create_emp():
@@ -185,8 +213,14 @@ def create_ord():
         new_ord = Orders(**date)
         db.session.add(new_ord)
         db.session.commit()
-        request.args = {"Заявки": new_ord.id}
-        return search()
+        customer_chat_id = Customers.query.filter_by(id=new_ord.customer).first().chat_id
+        employee_chat_id = Employees.query.filter_by(id=new_ord.creator).first().chat_id
+        if customer_chat_id:
+            bot.send_notification(customer_chat_id, f"Создана заявка: {new_ord}")
+        if employee_chat_id:
+            bot.send_notification(employee_chat_id, f"Создана заявка: {new_ord}")
+        request.args = {"id": new_ord.id}
+        return order()
 
 @app.route("/delete_dep")
 def delete_dep():
@@ -194,6 +228,20 @@ def delete_dep():
     db.session.delete(dep)
     db.session.commit()
     return all_departments()
+
+@app.route("/notificate_employees")
+def notificate_employees():
+    for employee in Employees.query.all():
+        orders = Orders.query.filter_by(creator=employee.id).filter(
+            (Orders.status == "Новый") |
+            (Orders.status == "В работе") |
+            (Orders.status == "Ждет запчасть")
+        ).all()
+        if employee.chat_id:
+            bot.send_notification(employee.chat_id, f"У вас {len(orders)} заявок:")
+            for order in orders:
+                bot.send_notification(employee.chat_id, order)
+    return all_employees()
 
 
 @app.route("/delete_emp")
@@ -230,6 +278,7 @@ def index():
 def help():
     return render_template('help.html', title="Помощь")
 
-app.run()
+if __name__ == "__main__":
+    app.run()
 
 

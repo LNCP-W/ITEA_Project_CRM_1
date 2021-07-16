@@ -10,6 +10,7 @@
 <br>
 <form>
   <select name="status">
+    <option value="activ">Все активные</option>
     <option value="Новый">Новый</option>
     <option value="В работе">В работе</option>
     <option value="Готов">Готов</option>
@@ -38,7 +39,7 @@
   </tr>
     {%for res in results %}
     <tr>
-      <td><a href="http://127.0.0.1:5000/search?Заявки={{res.id}}">{{res.id}}</a></td>
+      <td><a href="http://127.0.0.1:5000/order?id={{res.id}}">{{res.id}}</a></td>
       <td>{{res.created.strftime("%d/%m/%Y, %H:%M")}}</td>
       <td><a href="http://127.0.0.1:5000/search?Сотрудники={{res.creator}}">{{res.creator}}</a></td>
       <td><a href="http://127.0.0.1:5000/search?Клиенты={{res.customer}}">{{res.customer}}</a></td>
