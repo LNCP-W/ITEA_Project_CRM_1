@@ -69,19 +69,20 @@
     <th>Серийный номер</th>
     <th>Цена</th>
     <th>Обновлено</th>
-    <th></th>
+    <th>Клиент</th>
   </tr>
     {%for res in results[1] %}
     <tr>
-      <td><a href="http://127.0.0.1:5000/search?Заявки={{res.id}}">{{res.id}}</a></td>
+      <td><a href="http://127.0.0.1:5000/order?id={{res.id}}">{{res.id}}</a></td>
       <td>{{res.created.strftime("%d/%m/%Y, %H:%M")}}</td>
-      <td><a href="http://127.0.0.1:5000/search?Сотрудники={{res.creator}}">{{res.creator}}</a></td>
+      <td><a href="http://127.0.0.1:5000/employee?id={{res.creator}}">{{res.creator}}</a></td>
       <td>{{res.status}}</td>
       <td>{{res.type}}</td>
       <td>{{res.descript}}</td>
       <td>{{res.serial}}</td>
       <td>{{res.price}}</td>
       <td>{{res.updated.strftime("%d/%m/%Y, %H:%M")}}</td>
+      <td><a href="http://127.0.0.1:5000/customer?id={{res.customer}}">{{res.customer}}</a></td>
     </tr>
   {% endfor%}
 </table>

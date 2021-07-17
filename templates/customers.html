@@ -19,7 +19,7 @@
 </form>
   {% for res in results %}
     <tr>
-      <td><a href="http://127.0.0.1:5000/search?Клиенты={{res.id}}">{{res.id}}</a></td>
+      <td><a href="http://127.0.0.1:5000/customer?id={{res.id}}">{{res.id}}</a></td>
       <td>{{res.name}}</td>
       <td><a href="tel:+{{res.phone}}">{{res.phone}}</a></td>
       <td>{% for res in range(res.is_problem*1) %} &#10004 {% endfor %}</td>

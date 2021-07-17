@@ -1,5 +1,8 @@
 import datetime
 import json
+
+import flask
+
 if __name__ == "__main__":
     import bot
 
@@ -50,6 +53,20 @@ def department():
     res = [Departments.query.filter_by(id=id).first(), Employees.query.filter_by(dep_id=id).limit(10).all()]
     return render_template('department.html', title=id, results=res)
 
+@app.route('/customer', methods=["GET"])
+def customer():
+    id = request.args["id"]
+    if "status" in request.args:
+        ordrs = Orders.query.filter_by(customer=id, status=request.args["status"]).limit(10).all()
+    elif "date" in request.args:
+        date = datetime.datetime.strptime(request.args["date"], "%Y-%m-%d")
+        ordrs = Orders.query.filter_by(customer=id).filter(
+            Orders.created>=date
+            ).filter(Orders.created < date + datetime.timedelta(days=1)).limit(10).all()
+    else:
+        ordrs = Orders.query.filter_by(customer=id).limit(10).all()
+    res = [Customers.query.filter_by(id=id).first(), ordrs]
+    return render_template('customer.html', title=id, results=res)
 
 @app.route('/employee', methods=["GET"])
 def employee():
@@ -102,22 +119,29 @@ def all_employees():
     page_title = 'Сотрудники'
     return render_template('employees.html', title=page_title, results=data)
 
+x = 0
 
 @app.route('/all_departments')
 def all_departments():
-    data = Departments.query.limit(10).all()
+    nn=request
+    global x
+    if 'sas' in request.args:
+        x += 10
+    else:
+        x = 0
+    data = Departments.query[x:x+10]
     page_title = 'Департаменты'
     return render_template('departments.html', title=page_title, results=data)
 
 @app.route('/edit_department', methods=["GET"])
 def edit_department():
-    dep = Departments.query.filter_by(id=request.args["id"]).first()
+    id = request.args['id']
+    dep = Departments.query.filter_by(id=id).first()
     dep.name = request.args["name"]
     dep.location = request.args["location"]
     dep.phone = request.args["phone"]
     db.session.commit()
-    request.args={"Департаменты":request.args["id"]}
-    return search
+    return flask.redirect(f"/department?id={id}")
 
 @app.route('/edit_employee', methods=["POST"])
 def edit_employee():
@@ -127,24 +151,21 @@ def edit_employee():
     emp.phone = request.values["phone"]
     emp.dep_id = request.values["dep_id"]
     db.session.commit()
-    request.args={"Сотрудники": request.values["id"]}
-    return search
+    request.args={"id": request.values["id"]}
+    return flask.redirect(f"/employee?id={emp.id}")
+
 
 @app.route('/edit_customer', methods=["POST"])
 def edit_customer():
-    x=request
     cust = Customers.query.filter_by(id=request.values ["id"]).first()
     cust.name = request.values["name"]
     cust.phone = request.values["phone"]
-    # if request.values['is_problem'] == "False":
-    #     is_problem = False
-    # else: is_problem = True
     if 'is_problem' in request.values:
         cust.is_problem = bool(request.values['is_problem'])
     else:cust.is_problem = 0
     db.session.commit()
-    request.args={"Клиенты": request.values["id"]}
-    return search
+    request.args={"id": request.values["id"]}
+    return flask.redirect(f"/customer?id={cust.id}")
 
 @app.route('/edit_order', methods=["GET"])
 def edit_order():
@@ -162,7 +183,7 @@ def edit_order():
         customer = Customers.query.filter_by(id=ord.customer).first().chat_id
         if customer:
             bot.send_notification(customer, f"Статус заяви №{ord.id} изменен: {request.args['status']}")
-    return order()
+    return flask.redirect(f"/order?id={ord.id}")
 
 @app.route("/create_dep")
 def create_dep():
@@ -173,8 +194,7 @@ def create_dep():
         new_dep = Departments(**request.args)
         db.session.add(new_dep)
         db.session.commit()
-        request.args = {"id": new_dep.id}
-        return department()
+        return flask.redirect(f"/department?id={new_dep.id}")
 
 
 @app.route("/create_customer")
@@ -186,8 +206,7 @@ def create_customer():
         new_cli = Customers(**request.args)
         db.session.add(new_cli)
         db.session.commit()
-        request.args = {"Клиенты": new_cli.id}
-        return all_orders
+        return flask.redirect(f"/customer?id={new_cli.id}")
 
 @app.route("/create_emp")
 def create_emp():
@@ -198,8 +217,7 @@ def create_emp():
         new_emp = Employees(**request.args)
         db.session.add(new_emp)
         db.session.commit()
-        request.args = {"Сотрудники": new_emp.id}
-        return search()
+        return flask.redirect(f"/employee?id={new_emp.id}")
 
 @app.route("/create_ord")
 def create_ord():
@@ -219,15 +237,14 @@ def create_ord():
             bot.send_notification(customer_chat_id, f"Создана заявка: {new_ord}")
         if employee_chat_id:
             bot.send_notification(employee_chat_id, f"Создана заявка: {new_ord}")
-        request.args = {"id": new_ord.id}
-        return order()
+        return flask.redirect(f"/order?id={new_ord.id}")
 
 @app.route("/delete_dep")
 def delete_dep():
     dep = Departments.query.filter_by(id=request.args['id']).first()
     db.session.delete(dep)
     db.session.commit()
-    return all_departments()
+    return flask.redirect("/all_departments")
 
 @app.route("/notificate_employees")
 def notificate_employees():
@@ -241,7 +258,7 @@ def notificate_employees():
             bot.send_notification(employee.chat_id, f"У вас {len(orders)} заявок:")
             for order in orders:
                 bot.send_notification(employee.chat_id, order)
-    return all_employees()
+    return flask.redirect("/all_employees")
 
 
 @app.route("/delete_emp")
@@ -249,7 +266,7 @@ def delete_emp():
     dep = Employees.query.filter_by(id=request.args['id']).first()
     db.session.delete(dep)
     db.session.commit()
-    return all_employees()
+    return flask.redirect("/all_employees")
 
 @app.route("/delete_cust")
 def delete_cust():
@@ -257,7 +274,7 @@ def delete_cust():
     if not dep: return all_customers()
     db.session.delete(dep)
     db.session.commit()
-    return all_customers()
+    return flask.redirect("/all_customers")
 
 
 @app.route("/delete_ordr")
@@ -266,10 +283,16 @@ def delete_ordr():
     if not ordr: return all_orders()
     db.session.delete(ordr)
     db.session.commit()
-    return all_orders()
+    return flask.redirect("/all_orders")
+
+@app.route("/send_to_cust")
+def send_to_cust():
+    chat_id = Customers.query.filter_by(id=request.args['id']).first().chat_id
+    bot.send_notification(chat_id, request.args['text'])
+    return flask.redirect(f"/customer?id={request.args['id']}")
 
 
-
+@app.route("/")
 @app.route("/index")
 def index():
     return render_template('index.html', title='Главная страница')

@@ -24,7 +24,7 @@
       <td>{{res.name}}</td>
       <td>{{res.position}}</td>
       <td><a href="tel:+{{res.phone}}">{{res.phone}}</a></td>
-      <td><a href="http://127.0.0.1:5000/search?Департаменты={{res.dep_id}}">{{res.dep_id}}</a></td>
+      <td><a href="http://127.0.0.1:5000/department?id={{res.dep_id}}">{{res.dep_id}}</a></td>
     </tr>
   {% endfor %}
 </table>

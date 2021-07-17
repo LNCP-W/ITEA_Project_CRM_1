@@ -34,8 +34,19 @@
          onclick="return confirm('Удалить Клиетга {{results[0].name}}?')"
          formaction="http://127.0.0.1:5000/delete_cust"
          value="Удалить">
+</form><br>
+<br>
+{% if results[0].is_subscribed %}
+<br><form>
+  <input type="search" hidden name="id" value="{{results[0].id}}">
+  <input type="text" name="text" placeholder="Введите сообщение">
+  <input type="submit"
+         onclick="alert('Готово')"
+         formaction="http://127.0.0.1:5000/send_to_cust"
+         value="Отправить">
 </form>
-<h2>Заявки созданые сотрудником</h2>
+{% endif %}
+<h2>Заявки клиента</h2>
 <table border="3">
   <tr>
     <th>ID Заявки</th>
@@ -51,9 +62,9 @@
   </tr>
     {%for res in results[1] %}
     <tr>
-      <td><a href="http://127.0.0.1:5000/search?Заявки={{res.id}}">{{res.id}}</a></td>
+      <td><a href="http://127.0.0.1:5000/order?id={{res.id}}">{{res.id}}</a></td>
       <td>{{res.created.strftime("%d/%m/%Y, %H:%M")}}</td>
-      <td><a href="http://127.0.0.1:5000/search?Сотрудники={{res.creator}}">{{res.creator}}</a></td>
+      <td><a href="http://127.0.0.1:5000/employee?id={{res.creator}}">{{res.creator}}</a></td>
       <td>{{res.status}}</td>
       <td>{{res.type}}</td>
       <td>{{res.descript}}</td>
