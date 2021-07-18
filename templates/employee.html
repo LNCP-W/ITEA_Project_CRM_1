@@ -34,12 +34,12 @@
  </form>
 <form>
   <input type="search" hidden name="id" value="{{results[0].id}}">
-  <input type="submit" onclick="return confirm('Удалить сотрудника {{results[0].name}}?')" formaction="http://127.0.0.1:5000/delete_emp" value="Удалить">
+  <input type="submit" onclick="return confirm('Удалить сотрудника {{results[0].name}}?')" formaction="http://127.0.0.1:5000/delete_emp" value="Удалить" formmethod="post">
 </form>
 <h2>Заявки созданые сотрудником</h2>
 <form>
   <input type="search" hidden name="creator" value="{{results[0].id}}">
-  <input type="submit" formaction="http://127.0.0.1:5000/create_ord" value="Регистрация Заявки">
+  <input type="submit" formaction="http://127.0.0.1:5000/create_ord" value="Регистрация Заявки" formmethod="post">
 </form>
 <form>
   <select name="status">
@@ -86,6 +86,24 @@
     </tr>
   {% endfor%}
 </table>
+</table>
+<table>
+  <tr>
+    <form>
+      <input name="prev" value="1" type="search" hidden>
+      <input name="id" value="{{results[0].id}}" type="search" hidden>
+      <input type="submit" formaction="http://127.0.0.1:5000/employee" value="prev 10" >
+    </form>
+  </tr>
+  <tr>
+    {% if results[1][9]: %}
+      <form>
+        <input name="next" value="1" type="search" hidden>
+        <input name="id" value="{{results[0].id}}" type="search" hidden>
+        <input type="submit" formaction="http://127.0.0.1:5000/employee" value="next 10" >
+      </form>
+    {%endif%}
+  </tr>
 </table>
 
 {% endblock %}

@@ -6,7 +6,7 @@
 
 <br>
 
-<form action="http://127.0.0.1:5000/edit_department" method="post/get" >
+<form action="http://127.0.0.1:5000/edit_department" method="post" >
     <table border="0">
        <tr>
             <td>ID Департамента</td>
@@ -30,13 +30,18 @@
  </form>
 <form>
   <input type="search" hidden name="id" value="{{results[0].id}}">
-  <input type="submit" onclick="return confirm('Удалить департамент {{results[0].name}}?')" formaction="http://127.0.0.1:5000/delete_dep" value="Удалить">
+  <input type="submit"
+         onclick="return confirm('Удалить департамент {{results[0].name}}?')"
+         formaction="http://127.0.0.1:5000/delete_dep"
+         value="Удалить"
+         formmethod="post"
+  >
 </form>
 
 <h2>Сотрудники департамента</h2>
 <form>
   <input type="search" hidden name="id" value="{{results[0].id}}">
-  <input type="submit" formaction="http://127.0.0.1:5000/create_emp" value="Регистрация сотрудника">
+  <input type="submit" formaction="http://127.0.0.1:5000/create_emp" value="Регистрация сотрудника" formmethod="post">
 </form>
 <table border="3">
   <tr>

@@ -6,6 +6,8 @@ if __name__ == "__main__":
 x = "1772461411:AAGpWy5vDHgvw0lOpqegfV0tY7BUu-XIgQs"
 bot = TeleBot(token=x)
 
+"""Стартовая страница - выбор клиент или сотрудник"""
+
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -20,8 +22,11 @@ def start(message):
     bot.send_message(chat_id=message.chat.id, text="Вы сотрудник или клиент?", reply_markup=markup)
     bot.register_next_step_handler(message, select)
 
+
+"""Отправка номера телефона для регистрации"""
+
+
 def select(message):
-    x=message
     if message.text == 'Клиент':
         markup = types.ReplyKeyboardMarkup()
         button1 = types.KeyboardButton('Отправить контакт', request_contact=True)
@@ -34,6 +39,10 @@ def select(message):
         markup.add(button1)
         bot.send_message(chat_id=message.chat.id, text="Отправить номер телефона?", reply_markup=markup)
         bot.register_next_step_handler(message, subscribe_employee)
+
+
+"""отправка данных о клиенте в базу"""
+
 
 def subscribe_phone(message):
     if message.contact:
@@ -56,23 +65,11 @@ def subscribe_phone(message):
             main.db.session.commit()
             bot.send_message(chat_id=message.chat.id, text="Вы подписаны")
 
-def send_notification(chat_id, message):
-    bot.send_message(chat_id=chat_id, text=message)
 
-@bot.message_handler(commands=['reg_employee'])
-def reg_employee(message):
-    bot.send_message(
-        chat_id=message.chat.id,
-        text="Привет. Это бот сервисного центра 'Очень крутой сервисный центр'.")
-    markup = types.ReplyKeyboardMarkup(row_width=2)
-    button1 = types.KeyboardButton('Да', request_contact=True)
-    button2 = types.KeyboardButton('Нет')
-    markup.add(button1, button2)
-    bot.send_message(chat_id=message.chat.id, text="Вы наш сотрудник?", reply_markup=markup)
-    bot.register_next_step_handler(message, subscribe_employee)
+"""отправка данных о сотруднике в базу"""
+
 
 def subscribe_employee(message):
-
     if message.text == "Нет":
         bot.send_message(chat_id=message.chat.id, text="Всего хорошего")
 
@@ -89,7 +86,12 @@ def subscribe_employee(message):
                 text="Вы не зарегистрированы в системе. Пройдите регистрацию в CRM")
 
 
+"""отправка любых сообщений"""
+
+
+def send_notification(chat_id, message):
+    bot.send_message(chat_id=chat_id, text=message)
+
 
 if __name__ == "__main__":
     bot.polling()
-

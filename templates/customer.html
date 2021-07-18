@@ -33,7 +33,9 @@
   <input type="submit"
          onclick="return confirm('Удалить Клиетга {{results[0].name}}?')"
          formaction="http://127.0.0.1:5000/delete_cust"
-         value="Удалить">
+         value="Удалить"
+        formmethod="post"
+  >
 </form><br>
 <br>
 {% if results[0].is_subscribed %}
@@ -43,7 +45,9 @@
   <input type="submit"
          onclick="alert('Готово')"
          formaction="http://127.0.0.1:5000/send_to_cust"
-         value="Отправить">
+         value="Отправить"
+         formmethod="post"
+  >
 </form>
 {% endif %}
 <h2>Заявки клиента</h2>
@@ -73,7 +77,25 @@
       <td>{{res.updated.strftime("%d/%m/%Y, %H:%M")}}</td>
     </tr>
   {% endfor%}
-</table>
-</table>
 
+</table>
+</table>
+<table>
+  <tr>
+    <form>
+      <input name="prev" value="1" type="search" hidden>
+      <input name="id" value="{{results[0].id}}" type="search" hidden>
+      <input type="submit" formaction="http://127.0.0.1:5000/customer" value="prev 10" >
+    </form>
+  </tr>
+  <tr>
+    {% if results[1][9]: %}
+      <form>
+        <input name="next" value="1" type="search" hidden>
+        <input name="id" value="{{results[0].id}}" type="search" hidden>
+        <input type="submit" formaction="http://127.0.0.1:5000/customer" value="next 10" >
+      </form>
+    {%endif%}
+  </tr>
+</table>
 {% endblock %}

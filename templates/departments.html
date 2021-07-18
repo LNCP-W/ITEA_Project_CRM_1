@@ -9,7 +9,7 @@
 
 {% block results %}
 <form>
-  <input type="submit" formaction="http://127.0.0.1:5000/create_dep" value="Создать департамент">
+  <input type="submit" formaction="http://127.0.0.1:5000/create_dep" value="Создать департамент" formmethod="post">
 </form>
 <br>
 <table border="3">
@@ -28,10 +28,24 @@
     </tr>
   {% endfor %}
 </table>
-{% if results[9]: %}
-<form>
-  <input name="sas" value="1" type="search" hidden>
-  <input type="submit" formaction="http://127.0.0.1:5000/all_departments" value="next 10" >
-</form>
-{%endif%}
+
+<table>
+  <tr>
+    <form>
+      <input name="prev" value="1" type="search" hidden>
+      <input type="submit" formaction="http://127.0.0.1:5000/all_departments" value="prev 10" >
+    </form>
+  </tr>
+  <tr>
+    {% if results[9]: %}
+      <form>
+        <input name="next" value="1" type="search" hidden>
+        <input type="submit" formaction="http://127.0.0.1:5000/all_departments" value="next 10" >
+      </form>
+    {%endif%}
+  </tr>
+</table>
+
+
+
 {% endblock %}

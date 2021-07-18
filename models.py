@@ -5,6 +5,8 @@ app = Flask("my_app", template_folder='/home/myr/PycharmProjects/ITEA_projrct_CR
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:postgres@localhost/postgres"
 db = SQLAlchemy(app)
 
+"""Модель депрартамента"""
+
 
 class Departments(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -25,6 +27,9 @@ class Departments(db.Model):
         return str(res)
 
 
+"""Модель Сотрудника"""
+
+
 class Employees(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
@@ -32,7 +37,6 @@ class Employees(db.Model):
     phone = db.Column(db.BigInteger, nullable=False)
     dep_id = db.Column(db.Integer, db.ForeignKey('departments.id', ondelete='CASCADE'), nullable=False)
     chat_id = db.Column(db.BigInteger, unique=True)
-
 
     def __str__(self):
         return f"Employee {self.name} with id:{self.id} worked on position {self.position} " \
@@ -47,6 +51,9 @@ class Employees(db.Model):
                "department_id": self.dep_id
                }
         return str(res)
+
+
+"""Модель Клиента"""
 
 
 class Customers(db.Model):
@@ -71,6 +78,9 @@ class Customers(db.Model):
         return str(res)
 
 
+"""Модель Заявки"""
+
+
 class Orders(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created = db.Column(db.DateTime)
@@ -84,14 +94,11 @@ class Orders(db.Model):
     updated = db.Column(db.DateTime)
 
     def __str__(self):
-        return f"Order was created {self.created} by employee {str(self.creator)}. " \
-               f"Actual status is {self.status}, type: {self.type}, description: {self.descript}, " \
-               f"serial number: {self.serial}, last update: ."
+        return f"Заявка № {self.id} создана {self.created} сотрудником {str(self.creator)}. " \
+               f"Актуальный статус: {self.status}, тип: {self.type}, описание: {self.descript}, " \
+               f"серийный номер: {self.serial}, последние оновление: {self.updated}. Клиент: {self.customer}."
 
     def __repr__(self):
-        price = self.price
-        if not self.price:
-            price = ''
         res = {
               "id": self.id,
               "created": self.created.strftime('%d.%m.%Y %H:%M'),
@@ -100,10 +107,11 @@ class Orders(db.Model):
               "description": self.descript,
               "creator": self.creator,
               "serial": self.serial,
-              "price": price,
+              "price": self.price,
               "customer": self.customer
               }
         return str(res)
 
 
-db.create_all()
+if __name__ == "__main__":
+    db.create_all()

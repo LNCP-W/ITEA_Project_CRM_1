@@ -28,4 +28,20 @@
     </tr>
   {% endfor %}
 </table>
+<table>
+  <tr>
+    <form>
+      <input name="prev" value="1" type="search" hidden>
+      <input type="submit" formaction="http://127.0.0.1:5000/all_employees" value="prev 10" >
+    </form>
+  </tr>
+  <tr>
+    {% if results[9]: %}
+      <form>
+        <input name="next" value="1" type="search" hidden>
+        <input type="submit" formaction="http://127.0.0.1:5000/all_employees" value="next 10" >
+      </form>
+    {%endif%}
+  </tr>
+</table>
 {% endblock %}

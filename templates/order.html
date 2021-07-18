@@ -9,7 +9,7 @@
 <form id="data" action="http://127.0.0.1:5000/edit_order" method="post/get" >
     <table border="0">
        <tr>
-            <td>ID зафвки</td>
+            <td>ID заявки</td>
             <td><input readonly name="id"  value={{results.id}}><br></td>
         </tr>
         <tr>
@@ -67,7 +67,13 @@
  </form>
  <form>
      <input type="search" hidden name="id" value="{{results.id}}">
-     <input type="submit" onclick="return confirm('Удалить Заявку {{results.id}}?')" formaction="http://127.0.0.1:5000/delete_ordr" value="Удалить">
+     <input
+             type="submit"
+             onclick="return confirm('Удалить Заявку {{results.id}}?')"
+             formaction="http://127.0.0.1:5000/delete_ordr"
+             value="Удалить"
+             formmethod="post"
+     >
  </form>
 
 {% endblock %}
