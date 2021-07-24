@@ -6,14 +6,14 @@ import main
 @pytest.mark.parametrize('data_in, data_out', [
         (
             {
-                'customer': 3,
+                'customer': 23,
                 'status': 'Новый',
                 'type': "Платный",
                 'descript': "поломка",
                 'creator': 1,
                 'serial': "666",
                 'price': '13'},
-            '3, Новый, Платный, поломка, 1, 666, 13'
+            '23, Новый, Платный, поломка, 1, 666, 13'
         ),
         (
             {
@@ -28,7 +28,7 @@ import main
         )
     ])
 def test_create_order(data_in, data_out):
-    resp = app.test_client().get("/create_ord", query_string=data_in)
+    resp = app.test_client().post("/create_ord", query_string=data_in)
     assert resp.status == '302 FOUND'
     res = main.Orders.query.filter_by(serial=data_in['serial']).first()
     assert res.customer == data_in['customer']

@@ -13,10 +13,10 @@ if __name__ == "__main__":
 
 query_offset = 0
 
-"""Увеличение/уменшение смещения отображения результатов на 10 """
-
 
 def next_10(req):
+    """Увеличение/уменшение смещения отображения результатов на 10 """
+
     global query_offset
     if 'next' in req.args:
         query_offset += 10
@@ -27,43 +27,41 @@ def next_10(req):
     return query_offset
 
 
-"""Проверка на существовние дубликата"""
-
-
 def if_exist(clas):
+    """Проверка на существовние дубликата"""
+
     exist_emp = clas.query.filter(
         (clas.name == request.values['name']) | (clas.phone == request.values['phone'])).all()
     if exist_emp:
         return render_template('index.html', title="Запись с таким иминем уже существует")
 
 
-"""Поиск записи по ID
-На вход принимает аргументы: ключ(тип записи) и значение(ID записи)ю
-В зависимости от ключа возвращает: саму запись, привязаныее к нея записи и файл для рендера.
-При отсутствии записи в базе - возвращает главную страницу с оповещением б ошибке"""
-
-
 @app.route('/search', methods=["GET"])
 def search():
+    """Поиск записи по ID
+    На вход принимает аргументы: ключ(тип записи) и значение(ID записи)ю
+    В зависимости от ключа возвращает: саму запись, привязаныее к нея записи и файл для рендера.
+    При отсутствии записи в базе - возвращает главную страницу с оповещением б ошибке"""
+
     for x in request.args.items():
         dict_do = {
             'Заявки': [Orders.query.filter_by(id=x[1]).first(), 1, 'order.html'],
             'Сотрудники': [
-                        Employees.query.filter_by(id=x[1]).first(),
-                        Orders.query.filter_by(creator=x[1]).limit(10).all(),
-                        'employee.html'
-                        ],
+                Employees.query.filter_by(id=x[1]).first(),
+                Orders.query.filter_by(creator=x[1]).limit(10).all(),
+                'employee.html'
+            ],
             'Департаменты': [
-                        Departments.query.filter_by(id=x[1]).first(),
-                        Employees.query.filter_by(dep_id=x[1]).limit(10).all(),
-                        'department.html'
-                        ],
+                Departments.query.filter_by(id=x[1]).first(),
+                Employees.query.filter_by(dep_id=x[1]).limit(10).all(),
+                'department.html'
+            ],
             'Клиенты': [
-                        Customers.query.filter_by(id=x[1]).first(),
-                        Orders.query.filter_by(customer=x[1]).limit(10).all(),
-                        'customer.html'
-                        ]
-            }
+                Customers.query.filter_by(id=x[1]).first(),
+                Orders.query.filter_by(customer=x[1]).limit(10).all(),
+                'customer.html'
+            ]
+        }
     res = dict_do[x[0]]
     if not res[0]:
         res = "Нет такого id"
@@ -71,35 +69,31 @@ def search():
     return render_template(res[2], title=res[0].id, results=res)
 
 
-"""Отображение отдельной заявки. В запросе - id заявки"""
-
-
 @app.route('/order', methods=["GET"])
 def order():
+    """Отображение отдельной заявки. В запросе - id заявки"""
+
     ord_id = request.args["id"]
     res = Orders.query.filter_by(id=ord_id).first()
     return render_template('order.html', title=ord_id, results=res)
 
 
-"""Отображение отдельного департамента. 
-В запросе - id департамента. Возвращает сам департамент и сотрудников которые к нему привязаны"""
-
-
 @app.route('/department', methods=["GET"])
 def department():
+    """Отображение отдельного департамента.
+    В запросе - id департамента. Возвращает сам департамент и сотрудников которые к нему привязаны"""
+
     dep_id = request.args["id"]
     res = [Departments.query.filter_by(id=dep_id).first(), Employees.query.filter_by(dep_id=dep_id).limit(10).all()]
     return render_template('department.html', title=dep_id, results=res)
 
 
-"""Отображение отдельного клиента. 
-В запросе - id клиента. Возвращает самого клиента и заявки которые к нему привязаны.
-Если в запросе присутствует ключ status или date отображаюся только данные отфильтрованы по значению ключя.
-"""
-
-
 @app.route('/customer', methods=["GET"])
 def customer():
+    """Отображение отдельного клиента.
+    В запросе - id клиента. Возвращает самого клиента и заявки которые к нему привязаны.
+    Если в запросе присутствует ключ status или date отображаюся только данные отфильтрованы по значению ключя.
+    """
     query_offset = next_10(request)  # увеличение query.offset по запросу
     customer_id = request.args["id"]
     customer = Customers.query.filter_by(id=customer_id).first()
@@ -119,50 +113,48 @@ def customer():
     return render_template('customer.html', title=customer_id, results=res)
 
 
-"""Отображение отдельного работника. 
-В запросе - id работника. Возвращает самого работника и заявки которые к нему привязаны.
-Если в запросе присутствует ключ status или date отображаюся только данные отфильтрованы по значению ключя.
-"""
-
-
 @app.route('/employee', methods=["GET"])
 def employee():
+    """Отображение отдельного работника.
+    В запросе - id работника. Возвращает самого работника и заявки которые к нему привязаны.
+    Если в запросе присутствует ключ status или date отображаюся только данные отфильтрованы по значению ключя.
+    """
+
     query_offset = next_10(request)  # увеличение query.offset по запросу
     emp_id = request.args["id"]
     if "status" in request.args:
         ordrs = Orders.query.filter_by(
-                creator=emp_id,
-                status=request.args["status"]
-            ).limit(10).offset(query_offset).all()
+            creator=emp_id,
+            status=request.args["status"]
+        ).limit(10).offset(query_offset).all()
     elif "date" in request.args:
         date = datetime.datetime.strptime(request.args["date"], "%Y-%m-%d")
         ordrs = Orders.query.filter_by(creator=emp_id).filter(
             Orders.created >= date
-            ).filter(Orders.created < date + datetime.timedelta(days=1)).limit(10).offset(query_offset).all()
+        ).filter(Orders.created < date + datetime.timedelta(days=1)).limit(10).offset(query_offset).all()
     else:
         ordrs = Orders.query.filter_by(creator=emp_id).limit(10).offset(query_offset).all()
-    res = (Employees.query.filter_by(id=id).first(), ordrs)
+    employee = Employees.query.filter_by(id=emp_id).first()
+    res = (employee, ordrs)
     if not res[0]:
         emp_id = "Нет такого id"
     return render_template('employee.html', title=emp_id, results=res)
 
 
-"""Отображение всех клиентов.(порционно по 10 шт) """
-
-
 @app.route('/all_customers')
 def all_customers():
+    """Отображение всех клиентов.(порционно по 10 шт) """
+
     query_offset = next_10(request)  # увеличение query.offset по запросу
     data = Customers.query.limit(10).offset(query_offset).all()
     return render_template('customers.html', title="Клиенты", results=data)
 
 
-"""Отображение всех Заявок.(порционно по 10 шт) 
-Если в запросе есть ключь status или date - идет фильтрация по значению ключя"""
-
-
 @app.route('/all_orders')
 def all_orders():
+    """Отображение всех Заявок.(порционно по 10 шт)
+    Если в запросе есть ключь status или date - идет фильтрация по значению ключя"""
+
     query_offset = next_10(request)  # увеличение query.offset по запросу
     if "status" in request.args:
         if request.args["status"] == 'activ':  # Отображение всех активных заявок
@@ -183,31 +175,28 @@ def all_orders():
     return render_template('orders.html', title="Заявки", results=orders)
 
 
-"""Отображение всех сотрудников.(порционно по 10 шт) """
-
-
 @app.route('/all_employees')
 def all_employees():
+    """Отображение всех сотрудников.(порционно по 10 шт) """
+
     query_offset = next_10(request)  # увеличение query.offset по запросу
     data = Employees.query.limit(10).offset(query_offset).all()
     return render_template('employees.html', title='Сотрудники', results=data)
 
 
-"""Отображение всех департаментов.(порционно по 10 шт) """
-
-
 @app.route('/all_departments')
 def all_departments():
+    """Отображение всех департаментов.(порционно по 10 шт) """
+
     query_offset = next_10(request)  # увеличение query.offset по запросу
     data = Departments.query.limit(10).offset(query_offset).all()
     return render_template('departments.html', title='Департаменты', results=data)
 
 
-"""Изминение данных депртамента """
-
-
 @app.route('/edit_department', methods=["POST"])
 def edit_department():
+    """Изминение данных депртамента """
+
     dep_id = request.values['id']
     dep = Departments.query.filter_by(id=dep_id).first()
     dep.name = request.values["name"]
@@ -217,11 +206,10 @@ def edit_department():
     return flask.redirect(f"/department?id={dep_id}")
 
 
-"""Изминение данных работника """
-
-
 @app.route('/edit_employee', methods=["POST"])
 def edit_employee():
+    """Изминение данных работника """
+
     emp = Employees.query.filter_by(id=request.values["id"]).first()
     emp.name = request.values["name"]
     emp.position = request.values["position"]
@@ -231,11 +219,10 @@ def edit_employee():
     return flask.redirect(f"/employee?id={emp.id}")
 
 
-"""Изминение данных клиента """
-
-
 @app.route('/edit_customer', methods=["POST"])
 def edit_customer():
+    """Изминение данных клиента """
+
     customer = Customers.query.filter_by(id=request.values["id"]).first()
     customer.name = request.values["name"]
     customer.phone = request.values["phone"]
@@ -247,13 +234,12 @@ def edit_customer():
     return flask.redirect(f"/customer?id={customer.id}")
 
 
-"""Изминение данных заявки. 
-Оновляется время обновления заявки.
-При изминении статуса - отправка сообщения клиенту в телеграмбот(если подписан) """
-
-
 @app.route('/edit_order', methods=["POST"])
 def edit_order():
+    """Изминение данных заявки.
+    Оновляется время обновления заявки.
+    При изминении статуса - отправка сообщения клиенту в телеграмбот(если подписан) """
+
     ord = Orders.query.filter_by(id=request.values["id"]).first()
     old_status = ord.status
     ord.creator = request.values["creator"]
@@ -271,13 +257,12 @@ def edit_order():
     return flask.redirect(f"/order?id={ord.id}")
 
 
-"""Создание департамента(страница создания и метод создания) 
-если нет аргументов - отображет страницу.
-Если существует депратамент с вводимым именем или телефоном - выдает ошибку"""
-
-
 @app.route("/create_dep", methods=["POST"])
 def create_dep():
+    """Создание департамента(страница создания и метод создания)
+    если нет аргументов - отображет страницу.
+    Если существует депратамент с вводимым именем или телефоном - выдает ошибку"""
+
     if not request.values:
         return render_template('create_dep.html', title='Cоздание департамента')
     else:
@@ -289,13 +274,12 @@ def create_dep():
         return flask.redirect(f"/department?id={new_dep.id}")
 
 
-"""Создание клиента (страница создания и метод создания) 
-если нет аргументов - отображет страницу.
-Если существует клиент с вводимым именем или телефоном  - выдает ошибку"""
-
-
 @app.route("/create_customer", methods=["POST"])
 def create_customer():
+    """Создание клиента (страница создания и метод создания)
+    если нет аргументов - отображет страницу.
+    Если существует клиент с вводимым именем или телефоном  - выдает ошибку"""
+
     if not request.values:
         return render_template('create_customer.html', title='Регистрация Клиента ')
     else:
@@ -307,13 +291,12 @@ def create_customer():
         return flask.redirect(f"/customer?id={new_cust.id}")
 
 
-"""Создание Работника (страница создания и метод создания) 
-если нет аргументов - отображет страницу.
-Если существует работник с вводимым именем или телефоном  - выдает ошибку"""
-
-
 @app.route("/create_emp", methods=["POST"])
 def create_emp():
+    """Создание Работника (страница создания и метод создания)
+    если нет аргументов - отображет страницу.
+    Если существует работник с вводимым именем или телефоном  - выдает ошибку"""
+
     if len(request.values) < 2:
         return render_template('create_emp.html', title='Регистрация Сотрудника', id=request.values['id'])
     else:
@@ -325,14 +308,13 @@ def create_emp():
         return flask.redirect(f"/employee?id={new_emp.id}")
 
 
-"""Создание заявки (страница создания и метод создания) 
-если нет аргументов - отображет страницу.
-Автоматически добавляется дата создания/оновления.
-Если сотрудник/работник подписаны - отправка сообщения о создании заявки"""
-
-
 @app.route("/create_ord", methods=["POST"])
 def create_ord():
+    """Создание заявки (страница создания и метод создания)
+    если нет аргументов - отображет страницу.
+    Автоматически добавляется дата создания/оновления.
+    Если сотрудник/работник подписаны - отправка сообщения о создании заявки"""
+
     if len(request.values) < 2:
         page_title = 'Регистрация Заявки'
         customers = Customers.query.all()
@@ -356,44 +338,40 @@ def create_ord():
         return flask.redirect(f"/order?id={new_ord.id}")
 
 
-"""Удаление департамента (удалятся все привязаные сотрудники и их заявки)"""
-
-
 @app.route("/delete_dep", methods=["POST"])
 def delete_dep():
+    """Удаление департамента (удалятся все привязаные сотрудники и их заявки)"""
+
     dep = Departments.query.filter_by(id=request.values['id']).first()
     db.session.delete(dep)
     db.session.commit()
     return flask.redirect("/all_departments")
 
 
-"""Удаление сотрудника (удалятся все привязаные заявки)"""
-
-
 @app.route("/delete_emp", methods=["POST"])
 def delete_emp():
+    """Удаление сотрудника (удалятся все привязаные заявки)"""
+
     dep = Employees.query.filter_by(id=request.values['id']).first()
     db.session.delete(dep)
     db.session.commit()
     return flask.redirect("/all_employees")
 
 
-"""Удаление клиента (удалятся все привязаные заявки)"""
-
-
 @app.route("/delete_cust", methods=["POST"])
 def delete_cust():
+    """Удаление клиента (удалятся все привязаные заявки)"""
+
     dep = Customers.query.filter_by(id=request.args['id']).first()
     db.session.delete(dep)
     db.session.commit()
     return flask.redirect("/all_customers")
 
 
-"""Удаление заявки"""
-
-
 @app.route("/delete_ordr", methods=["POST"])
 def delete_ordr():
+    """Удаление заявки"""
+
     ordr = Orders.query.filter_by(id=request.values['id']).first()
     if not ordr:
         return all_orders()
@@ -402,21 +380,19 @@ def delete_ordr():
     return flask.redirect("/all_orders")
 
 
-"""Отправка сообщения клиенту"""
-
-
 @app.route("/send_to_cust", methods=["POST"])
 def send_to_cust():
+    """Отправка сообщения клиенту"""
+
     chat_id = Customers.query.filter_by(id=request.values['id']).first().chat_id
     bot.send_notification(chat_id, request.values['text'])
     return flask.redirect(f"/customer?id={request.values['id']}")
 
 
-"""Отправка сообщения всем сотрудникам(если подписан) со списком открытых заявон на каждого"""
-
-
 @app.route("/notificate_employees", methods=["GET"])
 def notificate_employees():
+    """Отправка сообщения всем сотрудникам(если подписан) со списком открытых заявон на каждого"""
+
     for employee in Employees.query.all():
         orders = Orders.query.filter_by(creator=employee.id).filter(
             (Orders.status == "Новый") |
@@ -430,20 +406,18 @@ def notificate_employees():
     return flask.redirect("/all_employees")
 
 
-"""Главная страница"""
-
-
 @app.route("/")
 @app.route("/index")
 def index():
+    """Главная страница"""
+
     return render_template('index.html', title='Главная страница')
-
-
-"""Страница с инструкциями"""
 
 
 @app.route("/help")
 def help_docum():
+    """Страница с инструкциями"""
+
     return render_template('help.html', title="Помощь")
 
 

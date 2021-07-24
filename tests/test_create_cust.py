@@ -2,6 +2,7 @@ import pytest
 import main
 from main import app, db
 
+
 @pytest.mark.parametrize('data_in, data_out', [
         (
             {'name': 'first', 'phone': 3},
@@ -13,7 +14,7 @@ from main import app, db
         )
     ])
 def test_create_customer(data_in, data_out):
-    resp = app.test_client().get("/create_customer", query_string=data_in)
+    resp = app.test_client().post("/create_customer", query_string=data_in)
     assert resp.status == '302 FOUND'
     res = main.Customers.query.filter_by(name=data_in['name']).first()
     assert res.name == data_in['name']
@@ -22,8 +23,3 @@ def test_create_customer(data_in, data_out):
     assert result == data_out
     db.session.delete(res)
     db.session.commit()
-
-
-
-
-

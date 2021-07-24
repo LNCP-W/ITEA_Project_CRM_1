@@ -1,14 +1,16 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from envparse import Env
 
 app = Flask("my_app", template_folder='/home/myr/PycharmProjects/ITEA_projrct_CRM/templates')
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:postgres@localhost/postgres"
+postgres_connection_string = Env().str('postgres_connection_string')
+app.config["SQLALCHEMY_DATABASE_URI"] = postgres_connection_string
 db = SQLAlchemy(app)
-
-"""Модель депрартамента"""
 
 
 class Departments(db.Model):
+    """Модель депрартамента"""
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
     location = db.Column(db.String(50), nullable=False)
@@ -23,14 +25,13 @@ class Departments(db.Model):
             "name": self.name,
             "location": self.location,
             "phone": self.phone
-            }
+        }
         return str(res)
 
 
-"""Модель Сотрудника"""
-
-
 class Employees(db.Model):
+    """Модель Сотрудника"""
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
     position = db.Column(db.String(50), nullable=False)
@@ -44,19 +45,18 @@ class Employees(db.Model):
 
     def __repr__(self):
         res = {
-               "id": self.id,
-               "name": self.name,
-               "position": self.position,
-               "phone": self.phone,
-               "department_id": self.dep_id
-               }
+            "id": self.id,
+            "name": self.name,
+            "position": self.position,
+            "phone": self.phone,
+            "department_id": self.dep_id
+        }
         return str(res)
 
 
-"""Модель Клиента"""
-
-
 class Customers(db.Model):
+    """Модель Клиента"""
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
     phone = db.Column(db.BigInteger, nullable=False)
@@ -78,10 +78,9 @@ class Customers(db.Model):
         return str(res)
 
 
-"""Модель Заявки"""
-
-
 class Orders(db.Model):
+    """Модель Заявки"""
+
     id = db.Column(db.Integer, primary_key=True)
     created = db.Column(db.DateTime)
     status = db.Column(db.String(50), nullable=False)
@@ -100,16 +99,16 @@ class Orders(db.Model):
 
     def __repr__(self):
         res = {
-              "id": self.id,
-              "created": self.created.strftime('%d.%m.%Y %H:%M'),
-              "status": self.status,
-              "type": self.type,
-              "description": self.descript,
-              "creator": self.creator,
-              "serial": self.serial,
-              "price": self.price,
-              "customer": self.customer
-              }
+            "id": self.id,
+            "created": self.created.strftime('%d.%m.%Y %H:%M'),
+            "status": self.status,
+            "type": self.type,
+            "description": self.descript,
+            "creator": self.creator,
+            "serial": self.serial,
+            "price": self.price,
+            "customer": self.customer
+        }
         return str(res)
 
 

@@ -1,16 +1,17 @@
 from telebot import TeleBot, types
+from envparse import Env
 if __name__ == "__main__":
     import main
 
 
-x = "1772461411:AAGpWy5vDHgvw0lOpqegfV0tY7BUu-XIgQs"
-bot = TeleBot(token=x)
-
-"""Стартовая страница - выбор клиент или сотрудник"""
+bot_token = Env().str('bot_token')
+bot = TeleBot(token=bot_token)
 
 
 @bot.message_handler(commands=['start'])
 def start(message):
+    """Стартовая страница - выбор клиент или сотрудник"""
+
     bot.send_message(
         chat_id=message.chat.id,
         text=f"Привет, {message.chat.first_name} {message.chat.last_name}. "
@@ -23,10 +24,9 @@ def start(message):
     bot.register_next_step_handler(message, select)
 
 
-"""Отправка номера телефона для регистрации"""
-
-
 def select(message):
+    """Отправка номера телефона для регистрации"""
+
     if message.text == 'Клиент':
         markup = types.ReplyKeyboardMarkup()
         button1 = types.KeyboardButton('Отправить контакт', request_contact=True)
@@ -41,10 +41,9 @@ def select(message):
         bot.register_next_step_handler(message, subscribe_employee)
 
 
-"""отправка данных о клиенте в базу"""
-
-
 def subscribe_phone(message):
+    """отправка данных о клиенте в базу"""
+
     if message.contact:
         customer = main.Customers.query.filter_by(phone=message.contact.phone_number).first()
         if customer:
@@ -66,10 +65,9 @@ def subscribe_phone(message):
             bot.send_message(chat_id=message.chat.id, text="Вы подписаны")
 
 
-"""отправка данных о сотруднике в базу"""
-
-
 def subscribe_employee(message):
+    """отправка данных о сотруднике в базу"""
+
     if message.text == "Нет":
         bot.send_message(chat_id=message.chat.id, text="Всего хорошего")
 
@@ -86,10 +84,8 @@ def subscribe_employee(message):
                 text="Вы не зарегистрированы в системе. Пройдите регистрацию в CRM")
 
 
-"""отправка любых сообщений"""
-
-
 def send_notification(chat_id, message):
+    """отправка любых сообщений"""
     bot.send_message(chat_id=chat_id, text=message)
 
 
