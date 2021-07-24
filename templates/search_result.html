@@ -1,0 +1,20 @@
+{% extends 'basic.html' %}
+{% block search %}
+
+{% endblock %}
+
+{% block results %}
+<table border="3">
+<tr>
+    {% for res in results.keys() %}
+    <th>{{res}}</th>
+{% endfor %}
+</tr>
+<tr>
+    {% for res in results.values() %}
+        <td>{{res}}</td>
+    {% endfor %}
+</tr>
+
+    </table>
+{% endblock %}

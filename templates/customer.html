@@ -1,0 +1,101 @@
+{% extends 'basic.html' %}
+
+{% block search %}
+{% endblock %}
+{% block results %}
+
+<br>
+
+<form action="http://127.0.0.1:5000/edit_customer" method="post" >
+    <table border="0">
+       <tr>
+            <td>ID Клиента</td>
+            <td><input readonly name="id" value={{results[0].id}}><br></td>
+        </tr>
+        <tr>
+            <td>Имя</td>
+            <td><input type="text" name="name" value="{{results[0].name}}"></td>
+        </tr>
+        <tr>
+            <td>Телефон</td>
+            <td><input type="number" name="phone" value="{{results[0].phone}}" max="999999999999"> </td>
+        </tr>
+        <tr>
+            <td>Конфликтный</td>
+            <td><input type="checkbox" name="is_problem" value="{{results[0].is_problem}}" {{"checked" *results[0].is_problem}}> </td>
+        </tr>
+    </table>
+    <input type="submit" value="Изменить">
+    <input type="reset" value="Очистить">
+ </form>
+<form>
+  <input type="search" hidden name="id" value="{{results[0].id}}">
+  <input type="submit"
+         onclick="return confirm('Удалить Клиетга {{results[0].name}}?')"
+         formaction="http://127.0.0.1:5000/delete_cust"
+         value="Удалить"
+        formmethod="post"
+  >
+</form><br>
+<br>
+{% if results[0].is_subscribed %}
+<br><form>
+  <input type="search" hidden name="id" value="{{results[0].id}}">
+  <input type="text" name="text" placeholder="Введите сообщение">
+  <input type="submit"
+         onclick="alert('Готово')"
+         formaction="http://127.0.0.1:5000/send_to_cust"
+         value="Отправить"
+         formmethod="post"
+  >
+</form>
+{% endif %}
+<h2>Заявки клиента</h2>
+<table border="3">
+  <tr>
+    <th>ID Заявки</th>
+    <th>Дата создания</th>
+    <th>Создатель</th>
+    <th>Статус</th>
+    <th>Тип</th>
+    <th>Описание</th>
+    <th>Серийный номер</th>
+    <th>Цена</th>
+    <th>Обновлено</th>
+    <th></th>
+  </tr>
+    {%for res in results[1] %}
+    <tr>
+      <td><a href="http://127.0.0.1:5000/order?id={{res.id}}">{{res.id}}</a></td>
+      <td>{{res.created.strftime("%d/%m/%Y, %H:%M")}}</td>
+      <td><a href="http://127.0.0.1:5000/employee?id={{res.creator}}">{{res.creator}}</a></td>
+      <td>{{res.status}}</td>
+      <td>{{res.type}}</td>
+      <td>{{res.descript}}</td>
+      <td>{{res.serial}}</td>
+      <td>{{res.price}}</td>
+      <td>{{res.updated.strftime("%d/%m/%Y, %H:%M")}}</td>
+    </tr>
+  {% endfor%}
+
+</table>
+</table>
+<table>
+  <tr>
+    <form>
+      <input name="prev" value="1" type="search" hidden>
+      <input name="id" value="{{results[0].id}}" type="search" hidden>
+      <input type="submit" formaction="http://127.0.0.1:5000/customer" value="prev 10" >
+    </form>
+  </tr>
+  <tr>
+    {% if results[1][9]: %}
+      <form>
+        <input name="next" value="1" type="search" hidden>
+        <input name="id" value="{{results[0].id}}" type="search" hidden>
+        <input type="submit" formaction="http://127.0.0.1:5000/customer" value="next 10" >
+      </form>
+    {%endif%}
+  </tr>
+</table>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'basic.html' %}
+
+{% block search %}
+<h2>Поиск департамента по id</h2>
+{{ super() }}
+<br>
+{% endblock %}
+
+
+{% block results %}
+<form>
+  <input type="submit" formaction="http://127.0.0.1:5000/create_dep" value="Создать департамент" formmethod="post">
+</form>
+<br>
+<table border="3">
+  <tr>
+    <th>ID Департамента</th>
+    <th>Название</th>
+    <th>Локация</th>
+    <th>Телефон</th>
+  </tr>
+  {% for res in results %}
+    <tr>
+      <td><a href="http://127.0.0.1:5000/department?id={{res.id}}">{{res.id}}</a></td>
+      <td>{{res.name}}</td>
+      <td>{{res.location}}</td>
+      <td><a href="tel:+{{res.phone}}">{{res.phone}}</a></td>
+    </tr>
+  {% endfor %}
+</table>
+
+<table>
+  <tr>
+    <form>
+      <input name="prev" value="1" type="search" hidden>
+      <input type="submit" formaction="http://127.0.0.1:5000/all_departments" value="prev 10" >
+    </form>
+  </tr>
+  <tr>
+    {% if results[9]: %}
+      <form>
+        <input name="next" value="1" type="search" hidden>
+        <input type="submit" formaction="http://127.0.0.1:5000/all_departments" value="next 10" >
+      </form>
+    {%endif%}
+  </tr>
+</table>
+
+
+
+{% endblock %}

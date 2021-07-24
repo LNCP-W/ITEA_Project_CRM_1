@@ -1,0 +1,47 @@
+{% extends 'basic.html' %}
+
+{% block search %}
+<h2>Поиск сотрудника по id</h2>
+{{ super() }}
+<br>
+{% endblock %}
+{% block results %}
+<form>
+<input type="submit" formaction="http://127.0.0.1:5000/notificate_employees" value="Известить всех" onclick="alert('Готово')">
+</form>
+<br>
+<table border="3">
+  <tr>
+    <th>ID Работника</th>
+    <th>Имя</th>
+    <th>Должность</th>
+    <th>Телефон</th>
+    <th>Департамент</th>
+  </tr>
+  {% for res in results %}
+    <tr>
+      <td><a href="http://127.0.0.1:5000/employee?id={{res.id}}">{{res.id}}</a></td>
+      <td>{{res.name}}</td>
+      <td>{{res.position}}</td>
+      <td><a href="tel:+{{res.phone}}">{{res.phone}}</a></td>
+      <td><a href="http://127.0.0.1:5000/department?id={{res.dep_id}}">{{res.dep_id}}</a></td>
+    </tr>
+  {% endfor %}
+</table>
+<table>
+  <tr>
+    <form>
+      <input name="prev" value="1" type="search" hidden>
+      <input type="submit" formaction="http://127.0.0.1:5000/all_employees" value="prev 10" >
+    </form>
+  </tr>
+  <tr>
+    {% if results[9]: %}
+      <form>
+        <input name="next" value="1" type="search" hidden>
+        <input type="submit" formaction="http://127.0.0.1:5000/all_employees" value="next 10" >
+      </form>
+    {%endif%}
+  </tr>
+</table>
+{% endblock %}

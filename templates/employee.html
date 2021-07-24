@@ -1,0 +1,109 @@
+{% extends 'basic.html' %}
+
+{% block search %}
+{% endblock %}
+{% block results %}
+
+<br>
+
+<form action="http://127.0.0.1:5000/edit_employee" method="POST" >
+    <table border="0">
+       <tr>
+            <td>ID Работника</td>
+            <td><input readonly name="id" value={{results[0].id}}><br></td>
+        </tr>
+        <tr>
+            <td>Имя</td>
+            <td><input type="text" name="name" value="{{results[0].name}}"></td>
+        </tr>
+        <tr>
+            <td>Должность</td>
+            <td><input type="text" name="position" value="{{results[0].position}}"></td>
+        </tr>
+        <tr>
+            <td>Телефон</td>
+            <td><input type="number" name="phone" value="{{results[0].phone}}" max="999999999999"> </td>
+        </tr>
+        <tr>
+            <td>Работает в</td>
+            <td><input type="number" name="dep_id" value="{{results[0].dep_id}}"> </td>
+        </tr>
+    </table>
+    <input type="submit" value="Изменить">
+    <input type="reset" value="Очистить">
+ </form>
+<form>
+  <input type="search" hidden name="id" value="{{results[0].id}}">
+  <input type="submit" onclick="return confirm('Удалить сотрудника {{results[0].name}}?')" formaction="http://127.0.0.1:5000/delete_emp" value="Удалить" formmethod="post">
+</form>
+<h2>Заявки созданые сотрудником</h2>
+<form>
+  <input type="search" hidden name="creator" value="{{results[0].id}}">
+  <input type="submit" formaction="http://127.0.0.1:5000/create_ord" value="Регистрация Заявки" formmethod="post">
+</form>
+<form>
+  <select name="status">
+    <option value="Новый">Новый</option>
+    <option value="В работе">В работе</option>
+    <option value="Готов">Готов</option>
+    <option value="Отказ">Отказ</option>
+    <option value="Ждет запчасть">Ждет запчасть</option>
+    <option value="Выдан клиету">Выдан клиету</option>
+  </select>
+  <input type="search" hidden name="id" value="{{results[0].id}}">
+  <input type="submit" formaction="http://127.0.0.1:5000/employee" value="Фильтровать по статусу">
+</form>
+<form>
+  <input type="date" name="date">
+  <input type="search" hidden name="id" value="{{results[0].id}}">
+  <input type="submit" formaction="http://127.0.0.1:5000/employee" value="Фильтровать по дате">
+</form>
+<table border="3">
+  <tr>
+    <th>ID Заявки</th>
+    <th>Дата создания</th>
+    <th>Создатель</th>
+    <th>Статус</th>
+    <th>Тип</th>
+    <th>Описание</th>
+    <th>Серийный номер</th>
+    <th>Цена</th>
+    <th>Обновлено</th>
+    <th>Клиент</th>
+  </tr>
+    {%for res in results[1] %}
+    <tr>
+      <td><a href="http://127.0.0.1:5000/order?id={{res.id}}">{{res.id}}</a></td>
+      <td>{{res.created.strftime("%d/%m/%Y, %H:%M")}}</td>
+      <td><a href="http://127.0.0.1:5000/employee?id={{res.creator}}">{{res.creator}}</a></td>
+      <td>{{res.status}}</td>
+      <td>{{res.type}}</td>
+      <td>{{res.descript}}</td>
+      <td>{{res.serial}}</td>
+      <td>{{res.price}}</td>
+      <td>{{res.updated.strftime("%d/%m/%Y, %H:%M")}}</td>
+      <td><a href="http://127.0.0.1:5000/customer?id={{res.customer}}">{{res.customer}}</a></td>
+    </tr>
+  {% endfor%}
+</table>
+</table>
+<table>
+  <tr>
+    <form>
+      <input name="prev" value="1" type="search" hidden>
+      <input name="id" value="{{results[0].id}}" type="search" hidden>
+      <input type="submit" formaction="http://127.0.0.1:5000/employee" value="prev 10" >
+    </form>
+  </tr>
+  <tr>
+    {% if results[1][9]: %}
+      <form>
+        <input name="next" value="1" type="search" hidden>
+        <input name="id" value="{{results[0].id}}" type="search" hidden>
+        <input type="submit" formaction="http://127.0.0.1:5000/employee" value="next 10" >
+      </form>
+    {%endif%}
+  </tr>
+</table>
+
+{% endblock %}
